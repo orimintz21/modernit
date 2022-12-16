@@ -1,6 +1,7 @@
 from random import randrange
 
-def extended_gcd(a,b):
+
+def extended_gcd(a, b):
     """
     Returns the extended gcd of a and b
 
@@ -12,10 +13,14 @@ def extended_gcd(a,b):
     -------
     (d, x, y): d = gcd(a,b) = a*x + b*y
     """
+    if b == 0:
+        return (a, 1, 0)
+    else:
+        (d, x, y) = extended_gcd(b, a % b)
+        return (d, y, x - (a // b) * y)
 
 
-
-def modular_inverse(a,n):
+def modular_inverse(a, n):
     """
     Returns the inverse of a modulo n if one exists
 
@@ -28,6 +33,11 @@ def modular_inverse(a,n):
     -------
     x: such that (a*x % n) == 1 and 0 <= x < n if one exists, else None
     """
+    (d, x, y) = extended_gcd(a, n)
+    if d == 1:
+        return x % n
+    else:
+        return None
 
 
 def modular_exponent(a, d, n):
@@ -43,7 +53,20 @@ def modular_exponent(a, d, n):
     Returns
     -------
     b: such that b == (a**d) % n
+
     """
+    binary = [int(k) for k in str(bin(d)[2:])]
+    rev_binary = binary[::-1]
+    a_arry = [a]
+    for i in range(1, len(binary)):
+        a_arry.append((a_arry[i-1] * a_arry[i-1]) % n)
+    b = 1
+    for i in range(len(binary)):
+        if rev_binary[i] == 1:
+            b = (b * a_arry[i]) % n
+
+    return b
+
 
 def miller_rabin(n):
     """
@@ -58,7 +81,7 @@ def miller_rabin(n):
     b: If n is prime, b is guaranteed to be True.
     If n is not a prime, b has a 3/4 chance at least to be False
     """
-    a = randrange(1,n)
+    a = randrange(1, n)
     k = 0
     d = n-1
     while d % 2 == 0:
@@ -74,6 +97,7 @@ def miller_rabin(n):
         if x == n-1:
             return True
     return False
+
 
 def is_prime(n):
     """
@@ -92,6 +116,7 @@ def is_prime(n):
         if not miller_rabin(n):
             return False
     return True
+
 
 def generate_prime(digits):
     for i in range(digits * 10):
